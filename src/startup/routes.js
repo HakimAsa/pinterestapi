@@ -4,6 +4,8 @@ import express from 'express'
 import { errorHandler, notFound } from '../middleware/error.js'
 
 // Import your routes here
+import boardRoutes from '../routes/board.routes.js'
+import commentRoutes from '../routes/comment.routes.js'
 import pinRoutes from '../routes/pin.routes.js'
 import userRoutes from '../routes/user.routes.js'
 
@@ -13,6 +15,8 @@ export default (app) => {
   app.use(express.urlencoded({ extended: true }))
 
   // Use your routes
+  app.use('/api/v1/boards', boardRoutes)
+  app.use('/api/v1/comments', commentRoutes)
   app.use('/api/v1/users', userRoutes)
   app.use('/api/v1/pins', pinRoutes)
 
