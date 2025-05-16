@@ -3,11 +3,13 @@ import express from 'express'
 
 // import setup routes
 import setupRoutes from './src/startup/routes.js'
+import connectDB from './src/startup/db.js'
 
 const PORT = process.env.PORT || 5001
 const ENV = process.env.NODE_ENV || 'development'
 const app = express()
 
+connectDB()
 setupRoutes(app)
 
 app.listen(PORT, () => {
