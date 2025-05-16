@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "joi": "^17.13.3"
   }
 }

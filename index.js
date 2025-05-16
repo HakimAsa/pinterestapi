@@ -1,18 +1,14 @@
 import 'colors'
 import express from 'express'
 
-const PORT = process.env.PORT || 5000
+// import setup routes
+import setupRoutes from './src/startup/routes.js'
+
+const PORT = process.env.PORT || 5001
 const ENV = process.env.NODE_ENV || 'development'
 const app = express()
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
-app.use('/test', (req, res) => {
-  return res.status(200).json({
-    message: 'Hello from the backend API!',
-  })
-})
+setupRoutes(app)
 
 app.listen(PORT, () => {
   console.log(
