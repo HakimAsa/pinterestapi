@@ -7,11 +7,10 @@
   "description": "Backend for Akimpin",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "node --watch --env-file=.env index.js"
   },
   "dependencies": {
     "colors": "^1.4.0",
-    "express": "^5.1.0",
-    "nodemon": "^3.1.10"
+    "express": "^5.1.0"
   }
 }
