@@ -12,16 +12,16 @@ export default (app) => {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
+  // Use your routes
+  app.use('/api/v1/users', userRoutes)
+  app.use('/api/v1/pins', pinRoutes)
+
   //test route
   app.use('/', (req, res) => {
     return res.status(200).send({
       message: 'Welcome to the AkimPin API Version 1.0',
     })
   })
-
-  // Use your routes
-  app.use('/api/v1/users', userRoutes)
-  app.use('/api/v1/pins', pinRoutes)
 
   // Handle 404 errors
   app.use(notFound)
