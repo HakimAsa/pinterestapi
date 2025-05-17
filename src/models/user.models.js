@@ -32,6 +32,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false, // Exclude password from queries
+      minlength: 6, // Minimum length of 6 characters
     },
   },
   { timestamps: true }

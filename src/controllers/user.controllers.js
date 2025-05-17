@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler'
+import bcrypt from 'bcryptjs'
 
 // Import your models here
 import User, { validateUser as validate } from '../models/user.models.js'
@@ -26,6 +27,30 @@ export const createUser = asyncHandler(async (req, res) => {
       message: error.details[0].message,
     })
   }
+  const orQuery = []
+  // Check if the email or username already exists
+  if (req.body.email) orQuery.push({ email: req.body.email })
+  if (req.body.username) orQuery.push({ username: req.body.username })
+
+  // Check if the user already exists
+  const userExists = await User.findOne({ $or: orQuery })
+  if (userExists) {
+    if (userExists.email === req.body.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists',
+      })
+    }
+    if (userExists.username === req.body.username) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username already exists',
+      })
+    }
+  }
+  // hash the password
+  req.body.password = await bcrypt.hash(req.body.password, 10)
+  // Create the user
   const user = await User.create(req.body)
   return res.status(201).json({
     success: true,
