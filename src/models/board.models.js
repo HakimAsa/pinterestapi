@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import Joi from 'joi'
 import JoiObjectId from 'joi-objectid'
 
-import models from '../utils/models'
+import models from '../utils/models.js'
 
 const Schema = mongoose.Schema
 const myJoiObjectId = JoiObjectId(Joi)
