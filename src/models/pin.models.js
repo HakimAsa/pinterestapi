@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
 import Joi from 'joi'
+import JoiObjectId from 'joi-objectid'
 
 import models from '../utils/models'
 
 const Schema = mongoose.Schema
+const myJoiObjectId = JoiObjectId(Joi)
 
 const pinSchema = new Schema(
   {
@@ -32,7 +34,6 @@ const pinSchema = new Schema(
     board: {
       type: Schema.Types.ObjectId,
       ref: models.BOARD,
-      required: true,
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -52,6 +53,15 @@ const Pin = mongoose.model(models.PIN, pinSchema)
 export const validatePin = (data, isRequired = true) => {
   const schema = Joi.object({
     // Define your validation schema here
+    media: isRequired ? Joi.string().uri().required() : Joi.string().uri(),
+    width: isRequired ? Joi.number().required() : Joi.number(),
+    height: isRequired ? Joi.number().required() : Joi.number(),
+    title: isRequired ? Joi.string().required() : Joi.string(),
+    description: isRequired ? Joi.string().required() : Joi.string(),
+    link: Joi.string().uri(),
+    board: Joi.myJoiObjectId(),
+    user: Joi.myJoiObjectId().required(),
+    tags: Joi.array().items(Joi.string()),
   })
   return schema.validate(data)
 }
