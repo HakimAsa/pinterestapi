@@ -2,14 +2,16 @@ import express from 'express'
 
 import endpoints from '../utils/endpoints.js'
 import { doSetForwardslash as dsf } from '../utils/helpers.js'
-import { createPin, getPins } from '../controllers/pin.controllers.js'
+import { createPin, getPin, getPins } from '../controllers/pin.controllers.js'
+import validateObjectId from '../middleware/validateObjectId.js'
 
-const { CREATE_PIN, FORWARDSLASH } = endpoints
+const { CONSID, CREATE_PIN, FORWARDSLASH } = endpoints
 
 const router = express.Router()
 
 // Define your routes here
 router.get(FORWARDSLASH, getPins)
 router.post(dsf(CREATE_PIN), createPin)
+router.get(dsf(CONSID), [validateObjectId], getPin)
 
 export default router
