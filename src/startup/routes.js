@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 
 // Import the global error middleware
 import { errorHandler, notFound } from '../middleware/error.js'
@@ -13,6 +14,9 @@ export default (app) => {
   // Middleware to parse JSON requests
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
+
+  //cors
+  app.use(cors())
 
   // Use your routes
   app.use('/api/v1/boards', boardRoutes)

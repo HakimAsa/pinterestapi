@@ -7,11 +7,19 @@ import Pin, { validatePin as validate } from '../models/pin.models.js'
 //@route GET /api/v1/pins
 //@access Private
 export const getPins = asyncHandler(async (req, res) => {
-  // Your logic here(
+  //Pagination
+  const pageNumber = Number(req.query.cursor) || 0
+  const LIMIT = 21 // number of items per page
   const pins = await Pin.find({})
+    .limit(LIMIT)
+    .skip(LIMIT * pageNumber)
+
+  const hasNextPage = pins.length === LIMIT
+
   return res.status(200).send({
     success: true,
     message: 'Pins fetched successfully',
+    nextCursor: hasNextPage ? pageNumber + 1 : null,
     data: pins,
   })
 })
