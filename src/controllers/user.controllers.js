@@ -3,7 +3,13 @@ import bcrypt from 'bcryptjs'
 
 // Import your models here
 import User, { validateUser as validate } from '../models/user.models.js'
+import models from '../utils/models.js'
+import fourOfour from '../utils/404.js'
+import { sendResponse } from '../utils/sendResponse.js'
 
+// @desc    fetch all uses
+// @route   GET /api/v1/users
+// @access  Private
 export const getUsers = asyncHandler(async (req, res) => {
   // Your logic here
   const users = await User.find({}).select('-password')
@@ -12,6 +18,17 @@ export const getUsers = asyncHandler(async (req, res) => {
     message: 'Users fetched successfully',
     data: users,
   })
+})
+
+// @desc    fetch a signle user
+// @route   GET /api/v1/users/username
+// @access  Private
+export const getUser = asyncHandler(async (req, res) => {
+  const username = req.user?.username || req.params.username
+  const user = await User.findOne({ username })
+  if (!user) return fourOfour(models.USER, username, res)
+
+  sendResponse(user, 'User fetched successfully', 200, res)
 })
 
 // @desc    Create a new user

@@ -15,6 +15,7 @@ export const getPins = asyncHandler(async (req, res) => {
   const LIMIT = 21 // number of items per page
   // search query
   const search = req.query.searchItem
+  const userId = req.query.userId
   const pins = await Pin.find(
     search
       ? {
@@ -23,6 +24,8 @@ export const getPins = asyncHandler(async (req, res) => {
             { tags: { $elemMatch: { $regex: search, $options: 'i' } } },
           ],
         }
+      : userId
+      ? { user: userId }
       : {}
   )
     .sort({ createdAt: -1 })
