@@ -6,8 +6,8 @@ import fourOfour from '../utils/404.js'
 import models from '../utils/models.js'
 import { sendResponse } from '../utils/sendResponse.js'
 
-//@desc get all pins
-//@route GET /api/v1/pins
+//@desc   Fetch all pins
+//@route  GET /api/v1/pins
 //@access Private
 export const getPins = asyncHandler(async (req, res) => {
   //Pagination
