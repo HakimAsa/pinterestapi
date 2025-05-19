@@ -1,6 +1,7 @@
 export default {
   BOARDS: 'boards',
   CONS_ID: ':id',
+  CONS_PIN_ID: ':pinId',
   CONS_USER_ID: ':userId',
   CONS_USERNAME: ':username',
   CREATE: 'create',
