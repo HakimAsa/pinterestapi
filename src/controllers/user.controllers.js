@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import bcrypt from 'bcryptjs'
-
+import Joi from 'joi'
+import jwt from 'jsonwebtoken'
 // Import your models here
 import User, { validateUser as validate } from '../models/user.models.js'
 import models from '../utils/models.js'
@@ -32,7 +33,7 @@ export const getUser = asyncHandler(async (req, res) => {
 })
 
 // @desc    Create a new user
-// @route   POST /api/v1/users/create-user
+// @route   POST /api/v1/users/auth/register
 // @access  Public
 // @param   {Object} req - The request object containing user data
 // @param   {Object} res - The response object to send the response
@@ -69,9 +70,82 @@ export const createUser = asyncHandler(async (req, res) => {
   req.body.password = await bcrypt.hash(req.body.password, 10)
   // Create the user
   const user = await User.create(req.body)
-  return res.status(201).json({
+  // send token response
+  sendTokenResponse(user, 201, res, 'User registered successfully')
+})
+
+// @desc    Log user in
+// @route   POST /api/v1/users/auth/login
+// @access  Public
+export const loginUser = asyncHandler(async (req, res) => {
+  const { error } = validateOnLogin(req.body)
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    })
+  }
+
+  const { email, password } = req.body
+
+  //check if password match
+  const user = await User.findOne({ email }).select('+password')
+  if (!user || !(await user.matchPassword(password)))
+    return res
+      .status(400)
+      .send({ success: false, message: 'Invalid Credentials' })
+
+  // send token response
+  sendTokenResponse(user, 200, res)
+})
+
+// @desc   Logout user and clear cookie
+// @route  GET /api/v1/users/auth/logout
+// @access Private
+export const logout = asyncHandler(async (req, res) => {
+  res.cookie('token', 'none', {
+    httpOnly: true,
+    sameSite: 'Strict', // Helps prevent CSRF attacks
+    secure: process.env.NODE_ENV === 'production', // ensure secure cookies in production
+    expires: new Date(0), //Immediately expires the cookie
+  })
+
+  return res.status(200).json({
     success: true,
-    message: 'User created successfully',
-    data: user,
+    message: 'Logout successfully',
   })
 })
+
+// Get token from model, create cookie and send response
+const sendTokenResponse = (
+  user,
+  statusCode,
+  res,
+  message = 'Successfully authenticated'
+) => {
+  const token = user.generateAuthToken()
+  const exp = Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+  const options = {
+    expires: new Date(exp),
+    httpOnly: true,
+    sameSite: 'Strict',
+    secure: process.env.NODE_ENV === 'production',
+  }
+
+  return res.status(statusCode).cookie('token', token, options).json({
+    sucess: true,
+    message,
+    token_type: 'Bearer',
+    token,
+    expiresIn: exp,
+  })
+}
+
+function validateOnLogin(req) {
+  const schema = Joi.object({
+    email: Joi.string().email().required().max(255),
+    password: Joi.string().required().min(6).max(20),
+  })
+
+  return schema.validate(req)
+}

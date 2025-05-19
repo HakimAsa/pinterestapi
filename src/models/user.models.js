@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
 import Joi from 'joi'
+import jwt from 'jsonwebtoken'
 
 import models from '../utils/models.js'
+import bcrypt from 'bcryptjs'
 
 const userSchema = new mongoose.Schema(
   {
@@ -40,6 +42,24 @@ const userSchema = new mongoose.Schema(
 )
 // Add indexes for unique fields
 userSchema.index({ email: 1, username: 1 }, { unique: true })
+
+// generate auth token
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign(
+    { _id: this._id, username: this.username },
+    process.env.JWT_PRIVATE_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  )
+
+  return token
+}
+
+// Match entered password with saved password in db
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password)
+}
 
 const User = mongoose.model(models.USER, userSchema)
 

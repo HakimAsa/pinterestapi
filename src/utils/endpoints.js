@@ -1,4 +1,5 @@
 export default {
+  AUTH: 'auth',
   BOARDS: 'boards',
   CONS_ID: ':id',
   CONS_PIN_ID: ':pinId',
@@ -8,7 +9,10 @@ export default {
   CREATE_PIN: 'create-pin',
   CREATE_USER: 'create-user',
   FORWARDSLASH: '/',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
   ME: 'me',
+  REGISTER: 'register',
   UPDATE: 'update',
   USERNAME: 'username',
 }
