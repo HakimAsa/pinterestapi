@@ -16,6 +16,7 @@ export const getPins = asyncHandler(async (req, res) => {
   // search query
   const search = req.query.searchItem
   const userId = req.query.userId
+  const boardId = req.query.boardId
   const pins = await Pin.find(
     search
       ? {
@@ -26,6 +27,8 @@ export const getPins = asyncHandler(async (req, res) => {
         }
       : userId
       ? { user: userId }
+      : boardId
+      ? { board: boardId }
       : {}
   )
     .sort({ createdAt: -1 })

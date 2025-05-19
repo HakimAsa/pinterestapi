@@ -37,7 +37,7 @@ const seedDB = async () => {
   for (const user of savedUsers) {
     for (let i = 1; i <= 10; i++) {
       boards.push({
-        title: `Board ${i}`,
+        title: `Board ${i} of user${i}`,
         user: user._id,
       })
     }
