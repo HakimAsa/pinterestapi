@@ -137,16 +137,13 @@ const sendTokenResponse = (
   const options = {
     expires: new Date(exp),
     httpOnly: true,
-    sameSite: 'Strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     secure: process.env.NODE_ENV === 'production',
   }
 
   return res.status(statusCode).cookie('token', token, options).json({
     sucess: true,
     message,
-    token_type: 'Bearer',
-    token,
-    expiresIn: exp,
   })
 }
 

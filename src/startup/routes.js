@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 // Import the global error middleware
 import { errorHandler, notFound } from '../middleware/error.js'
@@ -17,6 +18,9 @@ export default (app) => {
 
   //cors
   app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }))
+
+  // cooke-parser
+  app.use(cookieParser())
 
   // Use your routes
   app.use('/api/v1/boards', boardRoutes)
