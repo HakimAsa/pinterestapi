@@ -21,3 +21,19 @@ export const getPinComments = asyncHandler(async (req, res) => {
     res
   )
 })
+
+export const addComment = asyncHandler(async (req, res) => {
+  // add user dynamically
+  if (!req.body) req.body = {}
+  req.body.user = req.user._id.toString()
+  const { error } = validate(req.body)
+  if (error)
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    })
+
+  const comment = await Comment.create(req.body)
+
+  sendResponse(comment, `Comment added successfully!`, 200, res)
+})
