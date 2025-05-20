@@ -28,8 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default:
-        'https://res.cloudinary.com/dqj8v0x2g/image/upload/v1698231234/boardify/default-profile-picture.png',
+      default: 'https://picsum.photos/id/1/200/200',
     },
     password: {
       type: String,

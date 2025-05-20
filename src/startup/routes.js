@@ -16,7 +16,7 @@ export default (app) => {
   app.use(express.urlencoded({ extended: true }))
 
   //cors
-  app.use(cors())
+  app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }))
 
   // Use your routes
   app.use('/api/v1/boards', boardRoutes)

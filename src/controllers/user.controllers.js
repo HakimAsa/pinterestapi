@@ -21,14 +21,23 @@ export const getUsers = asyncHandler(async (req, res) => {
   })
 })
 
-// @desc    fetch a signle user
-// @route   GET /api/v1/users/username
+// @desc    fetch a signle user by user name
+// @route   GET /api/v1/users/:username
 // @access  Private
 export const getUser = asyncHandler(async (req, res) => {
-  const username = req.user?.username || req.params.username
+  const username = req.params.username
   const user = await User.findOne({ username })
   if (!user) return fourOfour(models.USER, username, res)
 
+  sendResponse(user, 'User fetched successfully', 200, res)
+})
+
+// @desc    fetch current logged in user
+// @route   GET /api/v1/users/me
+// @access  Private
+export const getMe = asyncHandler(async (req, res) => {
+  const id = req.user?._id
+  const user = await User.findById(id)
   sendResponse(user, 'User fetched successfully', 200, res)
 })
 
