@@ -14,6 +14,10 @@ const pinSchema = new Schema(
       type: String,
       required: true,
     },
+    mediaUrl: {
+      type: String,
+      required: true,
+    },
     width: {
       type: Number,
       required: true,
@@ -55,15 +59,16 @@ const Pin = mongoose.model(models.PIN, pinSchema)
 export const validatePin = (data, isRequired = true) => {
   const schema = Joi.object({
     // Define your validation schema here
-    media: isRequired ? Joi.string().uri().required() : Joi.string().uri(),
+    media: isRequired ? Joi.string().required() : Joi.string(),
+    mediaUrl: isRequired ? Joi.string().uri().required() : Joi.string().uri(),
     width: isRequired ? Joi.number().required() : Joi.number(),
     height: isRequired ? Joi.number().required() : Joi.number(),
     title: isRequired ? Joi.string().required() : Joi.string(),
     description: isRequired ? Joi.string().required() : Joi.string(),
     textOptions: Joi.object(),
     canvasOptions: Joi.object(),
-    link: Joi.string().uri(),
-    board: myJoiObjectId(),
+    link: Joi.string().uri().allow(null),
+    board: myJoiObjectId().allow(null),
     user: myJoiObjectId().required(),
     tags: Joi.array().items(Joi.string()),
   })
