@@ -8,6 +8,7 @@ export default {
   CREATE: 'create',
   CREATE_PIN: 'create-pin',
   CREATE_USER: 'create-user',
+  FOLLOW: 'follow',
   FORWARDSLASH: '/',
   LOGIN: 'login',
   LOGOUT: 'logout',

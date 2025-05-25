@@ -7,6 +7,7 @@ import User, { validateUser as validate } from '../models/user.models.js'
 import models from '../utils/models.js'
 import fourOfour from '../utils/404.js'
 import { sendResponse } from '../utils/sendResponse.js'
+import Follow from '../models/follow.models.js'
 
 // @desc    fetch all uses
 // @route   GET /api/v1/users
@@ -29,7 +30,27 @@ export const getUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username })
   if (!user) return fourOfour(models.USER, username, res)
 
-  sendResponse(user, 'User fetched successfully', 200, res)
+  //get followers and followings
+  const followerCount = await Follow.countDocuments({ following: user._id })
+  const followingCount = await Follow.countDocuments({ follower: user._id })
+
+  //check if already following this user
+  const isFollowing = await Follow.exists({
+    follower: req.user._id,
+    following: user._id,
+  })
+
+  sendResponse(
+    {
+      ...user.toObject(),
+      followerCount,
+      followingCount,
+      isFollowing: !!isFollowing,
+    },
+    'User fetched successfully',
+    200,
+    res
+  )
 })
 
 // @desc    fetch current logged in user
@@ -123,6 +144,41 @@ export const logout = asyncHandler(async (req, res) => {
     success: true,
     message: 'Logout successfully',
   })
+})
+
+// @desc   fetch followers and followings from user collections
+// @route  GET /api/v1/users/follow/:username
+// @access Private
+export const followUser = asyncHandler(async (req, res) => {
+  const { username } = req.params
+
+  //check if user exists
+  const user = await User.findOne({ username })
+  if (!user) return fourOfour(models.USER, username, res)
+
+  //check if already following, then unfollow
+  const isFollowing = await Follow.exists({
+    follower: req.user._id,
+    following: user._id,
+  })
+  // unfollow
+  if (isFollowing)
+    await Follow.deleteOne({
+      follower: req.user._id,
+      following: user._id,
+    })
+  else
+    await Follow.create({
+      follower: req.user._id,
+      following: user._id,
+    })
+
+  sendResponse(
+    null,
+    'User followers and followings fetched successfully',
+    200,
+    res
+  )
 })
 
 // Get token from model, create cookie and send response

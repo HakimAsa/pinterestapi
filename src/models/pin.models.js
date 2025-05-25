@@ -31,6 +31,8 @@ const pinSchema = new Schema(
       required: true,
     },
     link: String,
+    textOptions: Schema.Types.Mixed,
+    canvasOptions: Schema.Types.Mixed,
     board: {
       type: Schema.Types.ObjectId,
       ref: models.BOARD,
@@ -58,9 +60,11 @@ export const validatePin = (data, isRequired = true) => {
     height: isRequired ? Joi.number().required() : Joi.number(),
     title: isRequired ? Joi.string().required() : Joi.string(),
     description: isRequired ? Joi.string().required() : Joi.string(),
+    textOptions: Joi.object(),
+    canvasOptions: Joi.object(),
     link: Joi.string().uri(),
-    board: Joi.myJoiObjectId(),
-    user: Joi.myJoiObjectId().required(),
+    board: myJoiObjectId(),
+    user: myJoiObjectId().required(),
     tags: Joi.array().items(Joi.string()),
   })
   return schema.validate(data)

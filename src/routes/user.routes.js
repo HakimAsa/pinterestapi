@@ -2,6 +2,7 @@ import express from 'express'
 
 import {
   createUser,
+  followUser,
   getMe,
   getUser,
   getUsers,
@@ -13,17 +14,18 @@ import { doSetForwardslash as dsf } from '../utils/helpers.js'
 import validateObjectId from '../middleware/validateObjectId.js'
 import auth from '../middleware/auth.middleware.js'
 
-const { AUTH, CONS_USERNAME, FORWARDSLASH, LOGIN, LOGOUT, ME, REGISTER } =
-  endpoints
+const { AUTH, CONS_USERNAME, FOLLOW, LOGIN, LOGOUT, ME, REGISTER } = endpoints
 
 const router = express.Router()
 
 // Define your routes here
-router.route(FORWARDSLASH).get(getUsers)
+router.route(dsf()).get(getUsers)
 router.get(dsf(ME), auth, getMe)
 router.post(dsf(AUTH, REGISTER), createUser)
 router.post(dsf(AUTH, LOGIN), loginUser)
 router.post(dsf(AUTH, LOGOUT), logout)
-router.get(dsf(CONS_USERNAME), getUser) //// dynamic - keep this last
+// dynamic - keep these last
+router.get(dsf(CONS_USERNAME), [auth], getUser)
+router.get(dsf(FOLLOW, CONS_USERNAME), [auth], followUser)
 
 export default router

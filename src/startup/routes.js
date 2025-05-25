@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import fileUpload from 'express-fileupload'
 
 // Import the global error middleware
 import { errorHandler, notFound } from '../middleware/error.js'
@@ -21,6 +22,8 @@ export default (app) => {
 
   // cooke-parser
   app.use(cookieParser())
+  // fileupload
+  app.use(fileUpload())
 
   // Use your routes
   app.use('/api/v1/boards', boardRoutes)
