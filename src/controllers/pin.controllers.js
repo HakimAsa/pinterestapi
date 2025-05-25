@@ -58,7 +58,7 @@ export const getPin = asyncHandler(async (req, res) => {
 })
 
 //@desc Create a pin and save it to db
-//@route POST /api/v1/pins/create-pin
+//@route POST /api/v1/pins/create
 //@access Private
 export const createPin = asyncHandler(async (req, res) => {
   const { error } = validate(req.body)
