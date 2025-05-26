@@ -1,4 +1,5 @@
 import asyncHandler from 'express-async-handler'
+import Joi from 'joi'
 
 // Import your models here
 import Pin, { validatePin as validate } from '../models/pin.models.js'
@@ -7,6 +8,8 @@ import models from '../utils/models.js'
 import { sendResponse } from '../utils/sendResponse.js'
 import sharp from 'sharp'
 import ImageKit from 'imagekit'
+import Like from '../models/like.models.js'
+import Save from '../models/save.models.js'
 
 //@desc   Fetch all pins
 //@route  GET /api/v1/pins
@@ -173,12 +176,84 @@ export const createPin = asyncHandler(async (req, res) => {
       console.error(e)
       return res.status(500).json(e)
     })
-
-  // // validate inpute before uploading
-  // const { error } = validate(req.files)
-  // if (error)
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: error.details[0].message,
-  //   })
 })
+
+//@desc check interactions on pin
+//@route GET /api/v1/pins/:pinId/interactions-check
+//@access Private
+export const interactionCheck = asyncHandler(async (req, res) => {
+  const pinId = req.params.pinId
+  const pin = await Pin.findById(pinId)
+  if (!pin) return fourOfour(models.PIN, pinId, res)
+
+  const user = req.user._id
+  const likeCount = await Like.countDocuments({ pin: pinId })
+  const isLiked = await Like.exists({ pin: pinId, user })
+  const isSaved = await Save.exists({ pin: pinId, user })
+
+  sendResponse(
+    { isLiked: !!isLiked, isSaved: !!isSaved, likeCount },
+    'Pin interactions checked successfully',
+    200,
+    res
+  )
+})
+
+//@desc react to a pin by saving or liking it or removing the reaction
+//@route POST /api/v1/pins/:pinId/interact
+//@access Private
+export const interact = asyncHandler(async (req, res) => {
+  const { error } = validateOnInteract(req.body || {})
+  if (error)
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    })
+  const pinId = req.params.pinId
+  const user = req.user._id
+
+  // Check if the pin exists
+  const pin = await Pin.findById(pinId)
+  if (!pin) return fourOfour(models.PIN, pinId, res)
+
+  // Check if the user has already liked or saved the pin
+  if (req.body.type === 'like') {
+    const existingLike = await Like.findOne({ pin: pinId, user })
+    if (existingLike) {
+      // If the user has already liked the pin, remove the like
+      await Like.deleteOne({ pin: pinId, user })
+      return sendResponse(
+        { isLiked: false },
+        'Pin unliked successfully',
+        200,
+        res
+      )
+    }
+    // If the user has not liked the pin, create a new like
+    await Like.create({ pin: pinId, user })
+    return sendResponse({ isLiked: true }, 'Pin liked successfully', 201, res)
+  }
+  if (req.body.type === 'save') {
+    const existingSave = await Save.findOne({ pin: pinId, user })
+    if (existingSave) {
+      // If the user has already saved the pin, remove the save
+      await Save.deleteOne({ pin: pinId, user })
+      return sendResponse(
+        { isSaved: false },
+        'Pin unsaved successfully',
+        200,
+        res
+      )
+    }
+    // If the user has not saved the pin, create a new save
+    await Save.create({ pin: pinId, user })
+    return sendResponse({ isSaved: true }, 'Pin saved successfully', 201, res)
+  }
+})
+
+function validateOnInteract(data) {
+  const schema = Joi.object({
+    type: Joi.string().valid('like', 'save').required(),
+  })
+  return schema.validate(data)
+}
