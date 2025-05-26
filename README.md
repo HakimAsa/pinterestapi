@@ -71,8 +71,6 @@ pinterestapi
 | DELETE | `/api/v1/pins/:pinId`            | Delete a pin by ID                   | Yes           |
 | GET    | `/api/v1/users/follow/:username` | Get user followers and followings    | Yes           |
 
-````
-
 ### Example Request
 
 ```bash
@@ -132,4 +130,3 @@ To lint the code, use the following command:
 ```bash
 npm run lint
 ```
-````
