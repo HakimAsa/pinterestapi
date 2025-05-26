@@ -15,8 +15,10 @@ A RESTful API built with **Node.js**, **Express**, and **MongoDB** that powers a
 
 - **Backend**: Node.js, Express
 - **Database**: MongoDB (via Mongoose)
-- **Authentication**: JWT (if implemented)
+- **Authentication**: JWT (jsonwebtoken)
 - **Environment**: node --env-file=.env
+- **Testing**: Jest, supertest
+- **file upload**: imagekit
 
 ---
 
