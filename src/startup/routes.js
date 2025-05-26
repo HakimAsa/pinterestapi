@@ -2,7 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
-import sharp from 'sharp'
+import rateLimit from 'express-rate-limit'
+import hpp from 'hpp'
 
 // Import the global error middleware
 import { errorHandler, notFound } from '../middleware/error.js'
@@ -25,6 +26,17 @@ export default (app) => {
   app.use(cookieParser())
   // fileupload
   app.use(fileUpload())
+  // Prevent http param polution
+  app.use(hpp())
+  // Rate Limiting
+  const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, //10 min
+    max: 25, // 25 requests can be made in 10 min
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers,
+    message: 'Too many requests, please try again later.',
+  })
+
+  app.use(limiter)
 
   // Use your routes
   app.use('/api/v1/boards', boardRoutes)
