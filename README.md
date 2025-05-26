@@ -84,7 +84,7 @@ curl -X POST "https://your-backend-url.com/api/v1/users/auth/register" \
   "password": "examplePassword",
   displayName: "Example User"
 }'
-````
+```
 
 ### Example Response
 
@@ -132,3 +132,4 @@ To lint the code, use the following command:
 ```bash
 npm run lint
 ```
+````
