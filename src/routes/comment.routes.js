@@ -15,7 +15,7 @@ const router = express.Router()
 const { CONS_PIN_ID } = endpoints
 
 // Define routes here
-router.get(dsf(CONS_PIN_ID), [validateObjectId], getPinComments)
+router.get(dsf(CONS_PIN_ID), [validateObjectId, auth], getPinComments)
 router.post(dsf(), auth, addComment)
 
 export default router

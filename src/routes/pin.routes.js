@@ -32,6 +32,6 @@ router.get(
   interactionCheck
 )
 router.post(dsf(CONS_PIN_ID, INTERACT), [validateObjectId, auth], interact)
-router.get(dsf(CONS_ID), [validateObjectId], getPin)
+router.get(dsf(CONS_ID), [validateObjectId, auth], getPin)
 
 export default router
