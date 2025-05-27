@@ -42,10 +42,12 @@ export const getPins = asyncHandler(async (req, res) => {
 
   const hasNextPage = pins.length === LIMIT
 
-  return {
-    ...sendResponse(pins, 'Pins fetched successfully', 200, res),
+  return res.status(200).json({
+    success: true,
+    message: 'Pins fetched successfully',
     nextCursor: hasNextPage ? pageNumber + 1 : null,
-  }
+    data: pins,
+  })
 })
 
 //@desc Get a single pin from db
@@ -94,7 +96,7 @@ export const createPin = asyncHandler(async (req, res) => {
     textOptions = {}
   }
 
-  if (canvasOptions?.size !== 'original') {
+  if (canvasOptions?.size && canvasOptions?.size !== 'original') {
     clientAspectRatio =
       canvasOptions.size.split(':')[0] / canvasOptions.size.split(':')[1]
   } else {
@@ -124,11 +126,11 @@ export const createPin = asyncHandler(async (req, res) => {
     originalAspectRatio > clientAspectRatio && canvasOptions.size === 'original'
       ? ',cm-pad_resize'
       : ''
-  },bg-${canvasOptions.backgroundColor.substring(1)}${
+  },bg-${canvasOptions.backgroundColor?.substring(1)}${
     textOptions.text
       ? `,l-text,i-${textOptions.text},fs-${
           textOptions.fontSize * 2.1
-        },lx-${textLeftPosition},ly-${textTopPosition},co-${textOptions.color.substring(
+        },lx-${textLeftPosition},ly-${textTopPosition},co-${textOptions.color?.substring(
           1
         )},l-end`
       : ''

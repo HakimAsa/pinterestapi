@@ -31,7 +31,7 @@ export default (app) => {
   // Rate Limiting
   const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, //10 min
-    max: 25, // 25 requests can be made in 10 min
+    max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 25 requests can be made in 10 min
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers,
     message: 'Too many requests, please try again later.',
   })
