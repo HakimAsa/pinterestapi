@@ -6,8 +6,8 @@ A RESTful API built with **Node.js**, **Express**, and **MongoDB** that powers a
 
 ## 🚀 Live URL
 
-**Backend**: [https://your-backend-url.com/api](https://your-backend-url.com/api)
-**Frontend** (optional): [https://your-frontend-url.com](https://your-frontend-url.com)
+**Backend**: [api-doc](https://pinterestapi-a6zo.onrender.com)
+**Frontend**: [The Live site](https://full-stack-pinterest.onrender.com)
 
 ---
 
