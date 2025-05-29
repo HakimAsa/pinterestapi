@@ -61,7 +61,7 @@ userSchema.methods.generateRefreshAuthToken = function () {
     { _id: this._id, username: this.username },
     process.env.JWT_REFRESH_PRIVATE_KEY,
     {
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN, //'1m'
     }
   )
 }

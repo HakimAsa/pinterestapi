@@ -58,6 +58,14 @@ export default (app) => {
     // res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
   })
 
+  //entry point to serve the API doc
+  app.get('/favicon.ico', (req, res) => {
+    return res.status(200).send({
+      message: 'Welcome to the AkimPin API Favicon',
+    })
+    // res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
+  })
+
   //test route
   app.use('/health', (req, res) => {
     return res.status(200).send({
