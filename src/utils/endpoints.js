@@ -16,6 +16,7 @@ export default {
   LOGIN: 'login',
   LOGOUT: 'logout',
   ME: 'me',
+  REFRESH_TOKEN: 'refresh-token',
   REGISTER: 'register',
   UPDATE: 'update',
   USERNAME: 'username',

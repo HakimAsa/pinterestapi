@@ -55,6 +55,17 @@ userSchema.methods.generateAuthToken = function () {
   return token
 }
 
+//generate refresh token
+userSchema.methods.generateRefreshAuthToken = function () {
+  return jwt.sign(
+    { _id: this._id, username: this.username },
+    process.env.JWT_REFRESH_PRIVATE_KEY,
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+    }
+  )
+}
+
 // Match entered password with saved password in db
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password)

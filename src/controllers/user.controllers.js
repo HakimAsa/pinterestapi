@@ -129,11 +129,64 @@ export const loginUser = asyncHandler(async (req, res) => {
   sendTokenResponse(user, 200, res)
 })
 
+// @desc   Refresh token on auth token expiration
+// @route  GET /api/v1/users/auth/refresh-token
+// @access Public
+export const refreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies
+
+  if (!refreshToken)
+    return res
+      .status(401)
+      .json({ success: false, message: 'Missing refresh token' })
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_PRIVATE_KEY
+    )
+    const user = await User.findById(decoded._id)
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid refresh token' })
+
+    const newAccessToken = user.generateAuthToken()
+
+    // Issue new access token
+    res.cookie('token', newAccessToken, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(
+        Date.now() + process.env.JWT_ACCESS_COOKIE_EXPIRE * 60 * 1000
+      ), // 15 minutes
+    })
+    return res.status(200).json({ success: true })
+  } catch (error) {
+    return res.status(403).json({
+      success: false,
+      message: 'Expired or invalid refresh token',
+      reason: error,
+    })
+  }
+})
+
 // @desc   Logout user and clear cookie
 // @route  GET /api/v1/users/auth/logout
-// @access Private
+// @access Public
 export const logout = asyncHandler(async (req, res) => {
+  //clear auth token
   res.cookie('token', 'none', {
+    httpOnly: true,
+    sameSite: 'Strict', // Helps prevent CSRF attacks
+    secure: process.env.NODE_ENV === 'production', // ensure secure cookies in production
+    expires: new Date(0), //Immediately expires the cookie
+  })
+
+  //clear refresh token
+  res.cookie('refreshToken', 'none', {
+    path: '/api/v1/users/auth/refresh-token',
     httpOnly: true,
     sameSite: 'Strict', // Helps prevent CSRF attacks
     secure: process.env.NODE_ENV === 'production', // ensure secure cookies in production
@@ -188,16 +241,30 @@ const sendTokenResponse = (
   res,
   message = 'Successfully authenticated'
 ) => {
-  const token = user.generateAuthToken()
-  const exp = Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-  const options = {
-    expires: new Date(exp),
+  const accessToken = user.generateAuthToken() //short lived
+  const refreshToken = user.generateRefreshAuthToken() //long lived
+
+  const accessExp =
+    Date.now() + process.env.JWT_ACCESS_COOKIE_EXPIRE * 60 * 1000 // 15 minutes
+  const refreshExp =
+    Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+
+  res.cookie('token', accessToken, {
+    expires: new Date(accessExp),
     httpOnly: true,
     sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     secure: process.env.NODE_ENV === 'production',
-  }
+  })
 
-  return res.status(statusCode).cookie('token', token, options).json({
+  res.cookie('refreshToken', refreshToken, {
+    path: '/api/v1/users/auth/refresh-token', // restrict path
+    expires: new Date(refreshExp),
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    secure: process.env.NODE_ENV === 'production',
+  })
+
+  return res.status(statusCode).json({
     sucess: true,
     message,
   })
