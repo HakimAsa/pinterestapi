@@ -51,9 +51,12 @@ export default (app) => {
   app.use('/api/v1/pins', pinRoutes)
 
   //entry point to serve the API doc
-  // app.get('/', (req, res) => {
-  //   res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
-  // })
+  app.get('/', (req, res) => {
+    return res.status(200).send({
+      message: 'Welcome to the AkimPin API Version 1.0',
+    })
+    // res.sendFile(path.join(process.cwd(), 'public', 'index.html'))
+  })
 
   //test route
   app.use('/health', (req, res) => {
