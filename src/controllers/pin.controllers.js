@@ -16,36 +16,39 @@ import Save from '../models/save.models.js'
 //@access Private
 export const getPins = asyncHandler(async (req, res) => {
   //Pagination
-  const pageNumber = Number(req.query.cursor) || 0
   const LIMIT = 21 // number of items per page
   // search query
-  const search = req.query.searchItem
-  const userId = req.query.userId
-  const boardId = req.query.boardId
-  const pins = await Pin.find(
-    search
-      ? {
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { tags: { $elemMatch: { $regex: search, $options: 'i' } } },
-          ],
-        }
-      : userId
-      ? { user: userId }
-      : boardId
-      ? { board: boardId }
-      : {}
-  )
-    .sort({ createdAt: -1 })
-    .limit(LIMIT)
-    .skip(LIMIT * pageNumber)
+  const { searchItem: search, userId, boardId, cursor } = req.query
+
+  // build filter
+  const filter = {}
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { tags: { $elemMatch: { $regex: search, $options: 'i' } } },
+    ]
+  } else if (userId) {
+    filter.user = userId
+  } else if (boardId) {
+    filter.board = boardId
+  }
+
+  // If a cursor is passed, fetch documents **older** than the cursor (descending order)
+  if (cursor) {
+    filter.createdAt = { $lt: new Date(cursor) }
+  }
+
+  const pins = await Pin.find(filter).sort({ createdAt: -1 }).limit(LIMIT)
 
   const hasNextPage = pins.length === LIMIT
+  const nextCursor = hasNextPage
+    ? pins[pins.length - 1].createdAt.toISOString()
+    : null
 
   return res.status(200).json({
     success: true,
     message: 'Pins fetched successfully',
-    nextCursor: hasNextPage ? pageNumber + 1 : null,
+    nextCursor,
     data: pins,
   })
 })
